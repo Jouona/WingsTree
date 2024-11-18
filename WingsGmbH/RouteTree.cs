@@ -26,7 +26,7 @@
         foreach (var node in nodes) {
             string flightToStr = "";
             foreach (var route in node.Value.FlightTo) {
-                flightToStr += route.Value.To.Letter + " ";
+                flightToStr += route.Value.To.Letter + $"(weight: {route.Value.Weight}, cost: {route.Value.Cost}) ";
             }
 
             Console.WriteLine($"{node.Value.ThisLocation.Letter} --> {flightToStr}");
@@ -34,14 +34,14 @@
     }
 
     RouteNode GetOrAddNode(Location location) {
-        var node = nodes.GetValueOrDefault(location.Letter);
+        var containsKey = nodes.ContainsKey(location.Letter);
 
-        if (node == null) {
-            node = new RouteNode(location);
+        if (!containsKey) {
+            var node = new RouteNode(location);
             nodes.Add(location.Letter, node);
         }
 
-        return node;
+        return nodes[location.Letter];
     }
 
     class RouteNode {
@@ -53,6 +53,10 @@
         }
 
         public void AddRoute(RouteNode to, int weight, double cost) {
+            bool containsKey = FlightTo.ContainsKey(to.ThisLocation.Letter);
+            if (containsKey){
+                Console.WriteLine($"Route already exists: {ThisLocation.Letter} --> {FlightTo[to.ThisLocation.Letter].To.Letter}");
+                return;}
             this.FlightTo.Add(to.ThisLocation.Letter, new Route(to.ThisLocation, weight, cost));
         }
     }

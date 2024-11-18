@@ -1,16 +1,33 @@
 ﻿using System.Collections;
+using WingsGmbH;
 
 class Program {
     static void Main(string[] args) {
-        RouteTree routeTree = new RouteTree();
-        routeTree.AddRoute('a', 'b', 40, 20d);
-        routeTree.AddRoute('a', 'c', 20, 20d);
-        routeTree.AddRoute('a', 'd', 20, 20d);
-        routeTree.AddRoute('c', 'b', 20, 20d);
-        routeTree.AddRoute('b', 'e', 20, 20d);
-        routeTree.AddRoute('d', 'e', 20, 20d);
+        RouteTree testTree = new RouteTree();
+        testTree.AddRouteOneWay('a', 'b', 40, 40d);
+        testTree.AddRoute('b', 'a', 20, 20d);
+        //testTree.PrintTree();
+        //Console.WriteLine();
 
-        routeTree.PrintTree();
-        Console.WriteLine( routeTree.HoleStreckeGewicht('a', 'b'));
+        char[][] routes = {
+            ['a', 'b'],
+            ['a', 'c', 'b'],
+            ['a', 'd', 'e', 'b']
+        };
+        int[][] weightMask = {
+            [20],
+            [20, 20],
+            [20, 20, 20]
+        };
+        double[][] costMask = {
+            [20d],
+            [20d, 15d],
+            [20d, 20d, 30d]
+        };
+
+        Array2DConverter converter = new(routes, weightMask, costMask);
+        var routeTree2 = converter.ConvertToRouteTree();
+
+        routeTree2?.PrintTree();
     }
 }
