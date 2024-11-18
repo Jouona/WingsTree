@@ -27,7 +27,30 @@ class Program {
 
         Array2DConverter converter = new(routes, weightMask, costMask);
         var routeTree2 = converter.ConvertToRouteTree();
+        PrintListOfLists(routeTree2.FindPaths('a','b'));
 
         routeTree2?.PrintTree();
     }
+    
+    public static void PrintListOfLists(List<List<char>> listOfLists)
+    {
+        if (listOfLists == null || listOfLists.Count == 0)
+        {
+            Console.WriteLine("The list is empty.");
+            return;
+        }
+
+        foreach (var innerList in listOfLists)
+        {
+            if (innerList != null && innerList.Count > 0)
+            {
+                Console.WriteLine($"[{string.Join(", ", innerList)}]");
+            }
+            else
+            {
+                Console.WriteLine("[]"); // Handle empty or null inner lists
+            }
+        }
+    }
+
 }

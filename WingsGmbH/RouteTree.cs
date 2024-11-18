@@ -33,6 +33,36 @@
         }
     }
 
+    public List<List<char>> FindPaths(char start, char target) {
+        var allPaths = new List<List<char>>();
+        var currentPath = new List<char>();
+
+        FindPathsRecursive(nodes[start], start, target, currentPath, allPaths);
+
+        return allPaths;
+        
+        void FindPathsRecursive(RouteNode root, char start, char target, List<char> currentPath,
+            List<List<char>> allPaths) {
+            if (root == null) return;
+
+            // Add current node to the path
+            currentPath.Add(root.ThisLocation.Letter);
+
+            // Check if we have reached the target and started from the start node
+            if (root.ThisLocation.Letter == target && currentPath.Contains(start)) {
+                allPaths.Add(new List<char>(currentPath));
+            }
+
+            // Traverse children
+            foreach (var child in root.FlightTo) {
+                FindPathsRecursive(nodes[child.Value.To.Letter], start, target, currentPath, allPaths);
+            }
+
+            // Backtrack to explore other paths
+            currentPath.RemoveAt(currentPath.Count - 1);
+        }
+    }
+
     RouteNode GetOrAddNode(Location location) {
         var containsKey = nodes.ContainsKey(location.Letter);
 
@@ -54,22 +84,13 @@
 
         public void AddRoute(RouteNode to, int weight, double cost) {
             bool containsKey = FlightTo.ContainsKey(to.ThisLocation.Letter);
-            if (containsKey){
-                Console.WriteLine($"Route already exists: {ThisLocation.Letter} --> {FlightTo[to.ThisLocation.Letter].To.Letter}");
-                return;}
+            if (containsKey) {
+                Console.WriteLine(
+                    $"Route already exists: {ThisLocation.Letter} --> {FlightTo[to.ThisLocation.Letter].To.Letter}");
+                return;
+            }
+
             this.FlightTo.Add(to.ThisLocation.Letter, new Route(to.ThisLocation, weight, cost));
         }
     }
-}
-
-public struct Route(Location to, int weight, double cost) : IRoute {
-    public Location To { get; } = to;
-    public int Weight { get; } = weight;
-    public double Cost { get; } = cost;
-}
-
-public interface IRoute {
-    Location To { get; }
-    int Weight { get; }
-    double Cost { get; }
 }
