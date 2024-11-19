@@ -1,4 +1,14 @@
-﻿public class RouteTree {
+﻿// tree-like structure ist DEUTLICH besser und flexibler als dieses ÄUßERST KOMISCHE 2D Array für die Routen
+// deswegen benutzen wir ein ConvertToRouteTree interface, das momentan nur von 2DToRouteTreeConverter implementiert wird
+// ----
+// die Location Klasse wird hier nicht vernünftig verwendet, es werden immer neue Objekte erstellt, die synonym verwendet werden und diese werden nie gecacht, sehr schlecht für die GarbageCollection
+// Lösungsansatz hierfür wäre eine Flyweight-Factory oder die Locations zu cachen
+// ----
+// im Tree immer die Letters zu benutzen sorgt für sehr lange Referenzen zu den Letters. Bsp: nodes[child.Value.To.Letter]. Das ist etwas unschön und macht es schwerer verständlich
+// Letters werden auch oft synonym für Locations verwendet und teilweise für RouteNodes, das ist verwirrend und unschön
+// ----
+// Ich werde das alles hier aber nicht mehr ändern, es sind aber gute Möglichkeiten, das Programm künftig noch zu verbessern
+public class RouteTree {
     Dictionary<char, RouteNode> nodes = new();
 
     public void AddRoute(char from, char to, int weight, double cost) {
