@@ -8,8 +8,9 @@
 // Letters werden auch oft synonym für Locations verwendet und teilweise für RouteNodes, das ist verwirrend und unschön
 // ----
 // Ich werde das alles hier aber nicht mehr ändern, es sind aber gute Möglichkeiten, das Programm künftig noch zu verbessern
+
 public class RouteTree {
-    Dictionary<char, RouteNode> nodes = new();
+    readonly Dictionary<char, RouteNode> nodes = new();
 
     public void AddRoute(char from, char to, int weight, double cost) {
         var fromNode = GetOrAddNode(new Location(from));
@@ -43,29 +44,38 @@ public class RouteTree {
         }
     }
 
-    public List<List<char>> FindPaths(char start, char target) {
-        var allPaths = new List<List<char>>();
+    public List<(List<char>, double cost)> FindPaths(char start, char target, int gewicht) {
+        var allPaths = new List<(List<char>, double cost)>();
         var currentPath = new List<char>();
 
-        FindPathsRecursive(nodes[start], start, target, currentPath, allPaths);
+        FindPathsRecursive(null, nodes[start], start, target, currentPath, allPaths, 0d, gewicht);
 
         return allPaths;
-        
-        void FindPathsRecursive(RouteNode root, char start, char target, List<char> currentPath,
-            List<List<char>> allPaths) {
+
+        void FindPathsRecursive(RouteNode? parent, RouteNode? root, char start, char target, List<char> currentPath,
+            List<(List<char>, double cost)> allPaths, double cost, int gewicht) {
             if (root == null) return;
 
             // Add current node to the path
             currentPath.Add(root.ThisLocation.Letter);
+            if (parent != null) {
+                foreach (var thisNode in parent.FlightTo) {
+                    if (thisNode.Key == root.ThisLocation.Letter) {
+                        cost += thisNode.Value.Cost;
+                    }
+                }
+            }
 
             // Check if we have reached the target and started from the start node
             if (root.ThisLocation.Letter == target && currentPath.Contains(start)) {
-                allPaths.Add(new List<char>(currentPath));
+                allPaths.Add((new List<char>(currentPath), cost));
             }
 
             // Traverse children
             foreach (var child in root.FlightTo) {
-                FindPathsRecursive(nodes[child.Value.To.Letter], start, target, currentPath, allPaths);
+                if (child.Value.Weight >= gewicht)
+                    FindPathsRecursive(root, nodes[child.Value.To.Letter], start, target, currentPath, allPaths, cost,
+                        gewicht);
             }
 
             // Backtrack to explore other paths
